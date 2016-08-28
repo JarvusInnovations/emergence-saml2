@@ -9,7 +9,9 @@ Git::$repositories['emergence-saml2'] = [
         'php-classes/Emergence/SAML2/Container.php',
 
         'php-config/Emergence/Connectors/SAML2.config.php',
-        'php-config/Git.config.d',
+        'php-config/Git.config.d/emergence-saml2.php',
+        'php-config/Git.config.d/simplesamlphp-saml2.php',
+        'php-config/Git.config.d/xmlseclibs.php',
         'php-config/SAML2/Compat/ContainerSingleton.config.php',
         'php-config/TableManagerRequestHandler.config.d/emergence-saml2.php',
 
