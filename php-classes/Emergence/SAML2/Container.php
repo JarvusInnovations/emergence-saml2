@@ -2,7 +2,7 @@
 
 namespace Emergence\SAML2;
 
-class Container extends \SAML2_Compat_AbstractContainer
+class Container extends \SAML2\Compat\AbstractContainer
 {
     /**
      * @var Psr\Log\LoggerInterface

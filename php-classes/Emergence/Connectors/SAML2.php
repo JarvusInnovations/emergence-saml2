@@ -5,14 +5,14 @@ namespace Emergence\Connectors;
 use Site;
 use Emergence\People\IPerson;
 
-use SAML2_Const;
-use SAML2_Binding;
-use SAML2_Response;
-use SAML2_Assertion;
-use SAML2_Compat_ContainerSingleton;
-use SAML2_XML_saml_SubjectConfirmation;
-use SAML2_XML_saml_SubjectConfirmationData;
-use SAML2_HTTPPost;
+use SAML2\Constants AS SAML2_Constants;
+use SAML2\Binding;
+use SAML2\Response;
+use SAML2\Assertion;
+use SAML2\Compat\ContainerSingleton;
+use SAML2\XML\saml\SubjectConfirmation;
+use SAML2\XML\saml\SubjectConfirmationData;
+use SAML2\HTTPPost;
 
 use XMLSecurityKey;
 
@@ -38,7 +38,7 @@ class SAML2 extends \Emergence\Connectors\AbstractConnector implements \Emergenc
     public static function handleLoginRequest(IPerson $Person)
     {
         try {
-            $binding = SAML2_Binding::getCurrentBinding();
+            $binding = Binding::getCurrentBinding();
         } catch (Exception $e) {
             return static::throwUnauthorizedError('Cannot obtain SAML2 binding');
         }
@@ -46,23 +46,23 @@ class SAML2 extends \Emergence\Connectors\AbstractConnector implements \Emergenc
         $request = $binding->receive();
 
         // build response
-        $response = new SAML2_Response();
+        $response = new Response();
         $response->setInResponseTo($request->getId());
         $response->setRelayState($request->getRelayState());
         $response->setDestination($request->getAssertionConsumerServiceURL());
 
         // build assertion
-        $assertion = new SAML2_Assertion();
+        $assertion = new Assertion();
         $assertion->setIssuer(static::$issuer);
-        $assertion->setSessionIndex(SAML2_Compat_ContainerSingleton::getInstance()->generateId());
+        $assertion->setSessionIndex(ContainerSingleton::getInstance()->generateId());
         $assertion->setNotBefore(time() - 30);
         $assertion->setNotOnOrAfter(time() + 300);
-        $assertion->setAuthnContext(SAML2_Const::AC_PASSWORD);
+        $assertion->setAuthnContext(SAML2_Constants::AC_PASSWORD);
 
         // build subject confirmation
-        $sc = new SAML2_XML_saml_SubjectConfirmation();
-        $sc->Method = SAML2_Const::CM_BEARER;
-        $sc->SubjectConfirmationData = new SAML2_XML_saml_SubjectConfirmationData();
+        $sc = new SubjectConfirmation();
+        $sc->Method = SAML2_Constants::CM_BEARER;
+        $sc->SubjectConfirmationData = new SubjectConfirmationData();
         $sc->SubjectConfirmationData->NotOnOrAfter = $assertion->getNotOnOrAfter();
         $sc->SubjectConfirmationData->Recipient = $request->getAssertionConsumerServiceURL();
         $sc->SubjectConfirmationData->InResponseTo = $request->getId();
@@ -107,7 +107,7 @@ class SAML2 extends \Emergence\Connectors\AbstractConnector implements \Emergenc
 
 
         // send response
-        $responseBinding = new SAML2_HTTPPost();
+        $responseBinding = new HTTPPost();
         $responseBinding->send($response);
     }
 }
