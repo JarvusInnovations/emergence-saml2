@@ -14,7 +14,7 @@ use SAML2\XML\saml\SubjectConfirmation;
 use SAML2\XML\saml\SubjectConfirmationData;
 use SAML2\HTTPPost;
 
-use XMLSecurityKey;
+use RobRichards\XMLSecLibs\XMLSecurityKey;
 
 class SAML2 extends \Emergence\Connectors\AbstractConnector implements \Emergence\Connectors\IIdentityConsumer
 {
