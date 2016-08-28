@@ -2,11 +2,9 @@
 
 Git::$repositories['xmlseclibs'] = [
     'remote' => 'https://github.com/robrichards/xmlseclibs.git',
-    'originBranch' => '1.4',
-    'workingBranch' => '1.4',
+    'originBranch' => 'master',
+    'workingBranch' => 'master',
     'trees' => [
-        'php-classes/XMLSecEnc.php' => 'src/XMLSecEnc.php',
-        'php-classes/XMLSecurityDSig.php' => 'src/XMLSecurityDSig.php',
-        'php-classes/XMLSecurityKey.php' => 'src/XMLSecurityKey.php'
+        'php-classes/RobRichards/XMLSecLibs' => 'src'
     ]
 ];
