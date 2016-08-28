@@ -2,8 +2,8 @@
 
 Git::$repositories['simplesamlphp-saml2'] = [
     'remote' => 'https://github.com/simplesamlphp/saml2.git',
-    'originBranch' => 'master',
-    'workingBranch' => 'master',
+    'originBranch' => 'release-2.x',
+    'workingBranch' => 'release-2.x',
     'trees' => [
         'php-classes/SAML2' => 'src/SAML2'
     ]
