@@ -78,9 +78,7 @@ class SAML2 extends \Emergence\Connectors\AbstractConnector implements \Emergenc
         // set additional attributes
         $assertion->setAttributes([
             'User.Email' => [$Person->Email],
-            'User.Username' => [$Person->Username],
-            'first_name' => [$Person->FirstName],
-            'last_name' => [$Person->LastName]
+            'User.Username' => [$Person->Username]
         ]);
 
 
