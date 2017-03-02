@@ -35,11 +35,11 @@ class SAML2 extends \Emergence\Connectors\AbstractConnector implements \Emergenc
         }
     }
 
-    public static function handleLoginRequest(IPerson $Person)
+    public static function handleLoginRequest(IPerson $Person, $IdentityConsumer = null)
     {
         try {
             $binding = Binding::getCurrentBinding();
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return static::throwUnauthorizedError('Cannot obtain SAML2 binding');
         }
 
@@ -69,10 +69,14 @@ class SAML2 extends \Emergence\Connectors\AbstractConnector implements \Emergenc
         $assertion->setSubjectConfirmation([$sc]);
 
         // set NameID
-        $assertion->setNameId([
-            'Format' => 'urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress',
-            'Value' => $Person->Username.'@'.static::$issuer
-        ]);
+        if ($IdentityConsumer && is_a($IdentityConsumer, '\Emergence\Connectors\IIdentityConsumer', true)) {
+            $assertion->setNameId($IdentityConsumer::getSAMLNameId($Person));
+        } else {
+            $assertion->setNameId([
+                'Format' => 'urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress',
+                'Value' => $Person->Username.'@'.static::$issuer
+            ]);
+        }
 
 
         // set additional attributes
