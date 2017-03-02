@@ -39,7 +39,7 @@ class SAML2 extends \Emergence\Connectors\AbstractConnector implements \Emergenc
     {
         try {
             $binding = Binding::getCurrentBinding();
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             return static::throwUnauthorizedError('Cannot obtain SAML2 binding');
         }
 
