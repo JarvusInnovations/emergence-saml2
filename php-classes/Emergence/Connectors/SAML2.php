@@ -72,10 +72,7 @@ class SAML2 extends \Emergence\Connectors\AbstractConnector implements \Emergenc
         if ($IdentityConsumer && is_a($IdentityConsumer, '\Emergence\Connectors\IIdentityConsumer', true)) {
             $assertion->setNameId($IdentityConsumer::getSAMLNameId($Person));
         } else {
-            $assertion->setNameId([
-                'Format' => 'urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress',
-                'Value' => $Person->Username.'@'.static::$issuer
-            ]);
+            $assertion->setNameId(static::getSAMLNameId($Person));
         }
 
 
