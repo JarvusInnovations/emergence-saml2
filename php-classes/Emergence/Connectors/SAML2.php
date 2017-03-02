@@ -35,7 +35,7 @@ class SAML2 extends \Emergence\Connectors\AbstractConnector implements \Emergenc
         }
     }
 
-    public static function handleLoginRequest(IPerson $Person, $IdentityConsumer = null)
+    public static function handleLoginRequest(IPerson $Person, $identityConsumerClass = null)
     {
         try {
             $binding = Binding::getCurrentBinding();
@@ -69,8 +69,8 @@ class SAML2 extends \Emergence\Connectors\AbstractConnector implements \Emergenc
         $assertion->setSubjectConfirmation([$sc]);
 
         // set NameID
-        if ($IdentityConsumer && is_a($IdentityConsumer, '\Emergence\Connectors\IIdentityConsumer', true)) {
-            $assertion->setNameId($IdentityConsumer::getSAMLNameId($Person));
+        if ($identityConsumerClass && is_a($identityConsumerClass, IIdentityConsumer::class, true)) {
+            $assertion->setNameId($identityConsumerClass::getSAMLNameId($Person));
         } else {
             $assertion->setNameId(static::getSAMLNameId($Person));
         }
