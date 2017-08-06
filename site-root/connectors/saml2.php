@@ -1,3 +1,3 @@
 <?php
 
-Emergence\Connectors\SAML2::handleRequest();
+Emergence\SAML2\Connector::handleRequest();

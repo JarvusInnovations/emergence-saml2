@@ -1,10 +1,15 @@
 <?php
 
-namespace Emergence\Connectors;
+namespace Emergence\SAML2;
 
 use Site;
+
+use Emergence\Connectors\AbstractConnector;
+use Emergence\Connectors\IIdentityConsumer;
+use Emergence\Connectors\IdentityConsumerTrait;
 use Emergence\People\IPerson;
 
+use SAML2\Request;
 use SAML2\Constants AS SAML2_Constants;
 use SAML2\Binding;
 use SAML2\Response;
@@ -16,11 +21,10 @@ use SAML2\HTTPPost;
 
 use RobRichards\XMLSecLibs\XMLSecurityKey;
 
-class SAML2 extends \Emergence\Connectors\AbstractConnector implements \Emergence\Connectors\IIdentityConsumer
+class Connector extends AbstractConnector implements IIdentityConsumer
 {
-    use \Emergence\Connectors\IdentityConsumerTrait;
+    use IdentityConsumerTrait;
 
-    public static $issuer;
     public static $privateKey;
     public static $certificate;
 
@@ -35,7 +39,7 @@ class SAML2 extends \Emergence\Connectors\AbstractConnector implements \Emergenc
         }
     }
 
-    public static function handleLoginRequest(IPerson $Person, $identityConsumerClass = null)
+    public static function handleLoginRequest(IPerson $Person, $identityConsumerClass = __CLASS__)
     {
         try {
             $binding = Binding::getCurrentBinding();
@@ -43,15 +47,38 @@ class SAML2 extends \Emergence\Connectors\AbstractConnector implements \Emergenc
             return static::throwUnauthorizedError('Cannot obtain SAML2 binding');
         }
 
-        $request = $binding->receive();
-
         // build response
+        $response = static::getSAMLResponse($binding->receive(), $Person, $identityConsumerClass);
+
+        // prepare response
+        $responseXML = $response->toSignedXML();
+        $responseString = $responseXML->ownerDocument->saveXML($responseXML);
+
+        // send response
+        $responseBinding = new HTTPPost();
+        $responseBinding->send($response);
+    }
+
+    protected static function getSAMLResponse(Request $request, IPerson $Person, $identityConsumerClass = __CLASS__)
+    {
         $response = new Response();
         $response->setInResponseTo($request->getId());
         $response->setRelayState($request->getRelayState());
         $response->setDestination($request->getAssertionConsumerServiceURL());
+        $response->setAssertions([static::getSAMLAssertion($request, $Person, $identityConsumerClass)]);
 
-        // build assertion
+        // create signature
+        $privateKey = new XMLSecurityKey(XMLSecurityKey::RSA_SHA1, ['type' => 'private']);
+        $privateKey->loadKey(static::$privateKey);
+
+        $response->setSignatureKey($privateKey);
+        $response->setCertificates([static::$certificate]);
+
+        return $response;
+    }
+
+    protected static function getSAMLAssertion(Request $request, IPerson $Person, $identityConsumerClass = __CLASS__)
+    {
         $assertion = new Assertion();
         $assertion->setIssuer(static::$issuer);
         $assertion->setSessionIndex(ContainerSingleton::getInstance()->generateId());
@@ -68,45 +95,10 @@ class SAML2 extends \Emergence\Connectors\AbstractConnector implements \Emergenc
         $sc->SubjectConfirmationData->InResponseTo = $request->getId();
         $assertion->setSubjectConfirmation([$sc]);
 
-        // set NameID
-        if ($identityConsumerClass && is_a($identityConsumerClass, IIdentityConsumer::class, true)) {
-            $assertion->setNameId($identityConsumerClass::getSAMLNameId($Person));
-        } else {
-            $assertion->setNameId(static::getSAMLNameId($Person));
-        }
+        // set NameID and additional attributes
+        $assertion->setNameId($identityConsumerClass::getSAMLNameId($Person));
+        $assertion->setAttributes($identityConsumerClass::getSAMLAttributes($Person));
 
-
-        // set additional attributes
-        $assertion->setAttributes([
-            'User.Email' => [$Person->Email],
-            'User.Username' => [$Person->Username]
-        ]);
-
-
-        // attach assertion to response
-        $response->setAssertions([$assertion]);
-
-
-        // create signature
-        $privateKey = new XMLSecurityKey(XMLSecurityKey::RSA_SHA1, ['type' => 'private']);
-        $privateKey->loadKey(static::$privateKey);
-
-        $response->setSignatureKey($privateKey);
-        $response->setCertificates([static::$certificate]);
-
-
-        // prepare response
-        $responseXML = $response->toSignedXML();
-        $responseString = $responseXML->ownerDocument->saveXML($responseXML);
-
-
-        // dump response and quit
-#        header('Content-Type: text/xml');
-#        die($responseString);
-
-
-        // send response
-        $responseBinding = new HTTPPost();
-        $responseBinding->send($response);
+        return $assertion;
     }
 }
