@@ -7,7 +7,7 @@ Git::$repositories['emergence-saml2'] = [
     'trees' => [
         'php-classes/Emergence/SAML2',
 
-        'php-config/Emergence/SAML2/Connector.config.php',
+        'php-config/Emergence/SAML2',
         'php-config/Git.config.d/emergence-saml2.php',
         'php-config/Git.config.d/simplesamlphp-saml2.php',
         'php-config/Git.config.d/xmlseclibs.php',
