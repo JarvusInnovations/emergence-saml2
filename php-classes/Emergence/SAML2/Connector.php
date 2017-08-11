@@ -47,6 +47,10 @@ class Connector extends AbstractConnector implements IIdentityConsumer
             return static::throwUnauthorizedError('Cannot obtain SAML2 binding');
         }
 
+        if (!static::$privateKey || !static::$certificate) {
+            return static::throwError('SAML2 key and/or certificate not configured');
+        }
+
         // build response
         $response = static::getSAMLResponse($binding->receive(), $Person, $identityConsumerClass);
 
