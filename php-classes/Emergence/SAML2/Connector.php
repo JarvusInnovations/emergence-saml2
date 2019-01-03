@@ -39,7 +39,7 @@ class Connector extends AbstractConnector implements IIdentityConsumer
         }
     }
 
-    public static function handleLoginRequest(IPerson $Person, $identityConsumerClass = __CLASS__)
+    public static function handleLoginRequest(IPerson $Person)
     {
         try {
             $binding = Binding::getCurrentBinding();
@@ -52,7 +52,7 @@ class Connector extends AbstractConnector implements IIdentityConsumer
         }
 
         // build response
-        $response = static::getSAMLResponse($binding->receive(), $Person, $identityConsumerClass);
+        $response = static::getSAMLResponse($binding->receive(), $Person);
 
         // prepare response
         $responseXML = $response->toSignedXML();
@@ -63,13 +63,13 @@ class Connector extends AbstractConnector implements IIdentityConsumer
         $responseBinding->send($response);
     }
 
-    protected static function getSAMLResponse(Request $request, IPerson $Person, $identityConsumerClass = __CLASS__)
+    protected static function getSAMLResponse(Request $request, IPerson $Person)
     {
         $response = new Response();
         $response->setInResponseTo($request->getId());
         $response->setRelayState($request->getRelayState());
         $response->setDestination($request->getAssertionConsumerServiceURL());
-        $response->setAssertions([static::getSAMLAssertion($request, $Person, $identityConsumerClass)]);
+        $response->setAssertions([static::getSAMLAssertion($request, $Person)]);
 
         // create signature
         $privateKey = new XMLSecurityKey(XMLSecurityKey::RSA_SHA1, ['type' => 'private']);
@@ -81,7 +81,7 @@ class Connector extends AbstractConnector implements IIdentityConsumer
         return $response;
     }
 
-    protected static function getSAMLAssertion(Request $request, IPerson $Person, $identityConsumerClass = __CLASS__)
+    protected static function getSAMLAssertion(Request $request, IPerson $Person)
     {
         $assertion = new Assertion();
         $assertion->setIssuer(static::$issuer);
@@ -100,8 +100,8 @@ class Connector extends AbstractConnector implements IIdentityConsumer
         $assertion->setSubjectConfirmation([$sc]);
 
         // set NameID and additional attributes
-        $assertion->setNameId($identityConsumerClass::getSAMLNameId($Person));
-        $assertion->setAttributes($identityConsumerClass::getSAMLAttributes($Person));
+        $assertion->setNameId(static::getSAMLNameId($Person));
+        $assertion->setAttributes(static::getSAMLAttributes($Person));
 
         return $assertion;
     }
