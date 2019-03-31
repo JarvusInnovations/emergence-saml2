@@ -67,6 +67,7 @@ class Connector extends AbstractConnector implements IIdentityConsumer
     protected static function getSAMLResponse(Request $request, IPerson $Person)
     {
         $response = new Response();
+        $response->setIssuer(static::$issuer);
         $response->setInResponseTo($request->getId());
         $response->setRelayState($request->getRelayState());
         $response->setDestination($request->getAssertionConsumerServiceURL());
