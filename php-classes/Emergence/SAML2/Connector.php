@@ -57,6 +57,7 @@ class Connector extends AbstractConnector implements IIdentityConsumer
         // encode response manually if needed for debugging
         // $responseXML = $response->toSignedXML();
         // $responseString = $responseXML->ownerDocument->saveXML($responseXML);
+        // header('Content-Type: text/xml');
         // die($responseString);
 
         // send response
