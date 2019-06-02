@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 namespace SAML2\Assertion\Validation\ConstraintValidator;
 
 use SAML2\Assertion;
@@ -19,23 +17,12 @@ class SpIsValidAudience implements
      */
     private $serviceProvider;
 
-
-    /**
-     * @param ServiceProvider $serviceProvider
-     * @return void
-     */
-    public function setServiceProvider(ServiceProvider $serviceProvider) : void
+    public function setServiceProvider(ServiceProvider $serviceProvider)
     {
         $this->serviceProvider = $serviceProvider;
     }
 
-
-    /**
-     * @param Assertion $assertion
-     * @param Result $result
-     * @return void
-     */
-    public function validate(Assertion $assertion, Result $result) : void
+    public function validate(Assertion $assertion, Result $result)
     {
         $intendedAudiences = $assertion->getValidAudiences();
         if ($intendedAudiences === null) {
@@ -43,10 +30,10 @@ class SpIsValidAudience implements
         }
 
         $entityId = $this->serviceProvider->getEntityId();
-        if (!in_array($entityId, $intendedAudiences, true)) {
+        if (!in_array($entityId, $intendedAudiences)) {
             $result->addError(sprintf(
                 'The configured Service Provider [%s] is not a valid audience for the assertion. Audiences: [%s]',
-                strval($entityId),
+                $entityId,
                 implode('], [', $intendedAudiences)
             ));
         }
