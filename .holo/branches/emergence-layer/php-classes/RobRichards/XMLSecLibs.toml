@@ -1,5 +1,5 @@
 [holomapping]
 holosource = "xmlseclibs"
 root = "src"
-files = "*/**"
+files = "*"
 after = "emergence-saml2"
