@@ -1,0 +1,5 @@
+[holomapping]
+holosource = "simplesamlphp-saml2"
+root = "src/SAML2"
+files = "*/**"
+after = "emergence-saml2"
