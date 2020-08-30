@@ -1,5 +1,6 @@
 [holomapping]
 files = [
     "*/**",
+    "!.github/",
     "!php-config/Git.config.d/",
 ]
