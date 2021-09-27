@@ -1,19 +1,20 @@
-name: Projections
+name: 'Release: Projections'
 
 on:
   push:
-    branches:
-      - master
+    tags: [ 'v*' ]
+
+env:
+  GITHUB_TOKEN: ${{ secrets.BOT_GITHUB_TOKEN }}
+  HAB_LICENSE: accept
 
 jobs:
-  holobranch-projections:
+  release-projections:
     runs-on: ubuntu-latest
     steps:
+
     - name: 'Update holobranch: emergence/layer/master'
       uses: JarvusInnovations/hologit@actions/projector/v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        HAB_LICENSE: accept
       with:
         holobranch: emergence-layer
         commit-to: emergence/layer/master
